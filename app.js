@@ -1,6 +1,6 @@
 const express = require('express');
-const users = require('./data/users.json');
-const cards = require('./data/cards.json');
+const fs = require('fs').promises; // Usamos fs con promesas para poder usar async/await
+const path = require('path');
 
 const app = express();
 const PORT = 3000;
@@ -8,36 +8,65 @@ const PORT = 3000;
 // Middleware para parsear JSON
 app.use(express.json());
 
-/* GET /users - Devuelve lista JSON de los usuarios */
-app.get('/users', (req, res) => {
-  res.send(users);
-});
+// Función async que lee el archivo users.json
+const getUsers = async () => {
+  const filePath = path.join(__dirname, 'data', 'users.json');
+  const data = await fs.readFile(filePath, 'utf8');
+  return JSON.parse(data); // Convierte el JSON (string) a objeto/array JS
+};
 
-/* GET /cards - Devuelve lista JSON de las tarjetas */
-app.get('/cards', (req, res) => {
-  res.send(cards);
-});
+// Función async que lee cards.json
+const getCards = async () => {
+  const filePath = path.join(__dirname, 'data', 'cards.json');
+  const data = await fs.readFile(filePath, 'utf8');
+  return JSON.parse(data);
+};
 
-/* GET /users/:id - Devuelve un usuario por ID */
-app.get('/users/:id', (req, res) => {
-  const { id } = req.params;
-
-  const user = users.find((item) => item._id === id);
-
-  if (!user) {
-    res.status(404).json({ message: 'ID de usuario no encontrado' });
-    return;
+// GET /users → devuelve todos los usuarios
+app.get('/users', async (req, res) => {
+  try {
+    const users = await getUsers();
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ message: 'Error al leer el archivo de usuarios' });
   }
-
-  res.send(user);
 });
 
-/* Manejar rutas no existentes (incluye '/') */
+// GET /cards → devuelve todas las tarjetas
+app.get('/cards', async (req, res) => {
+  try {
+    const cards = await getCards();
+    res.json(cards);
+  } catch (err) {
+    res.status(500).json({ message: 'Error al leer el archivo de tarjetas' });
+  }
+});
+
+// GET /users/:id → busca un usuario por su ID
+app.get('/users/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const users = await getUsers();
+
+    const user = users.find((item) => item._id === id);
+
+    if (!user) {
+      res.status(404).json({ message: 'ID de usuario no encontrado' });
+      return;
+    }
+
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: 'Error al leer el archivo de usuarios' });
+  }
+});
+
+// Middleware para rutas no definidas → devuelve 404 siempre
 app.use((req, res) => {
   res.status(404).json({ message: 'Recurso solicitado no encontrado' });
 });
 
-// Levantar servidor
+// Inicia el servidor y escucha en el puerto 3000
 app.listen(PORT, () => {
   console.log(`Servidor ejecutándose en http://localhost:${PORT}`);
 });
