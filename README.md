@@ -24,8 +24,7 @@ Este servidor expone una API RESTful para gestionar **usuarios** y **tarjetas**,
 ## 📂 Tecnologías
 - Node.js  
 - Express  
-- fs.promises  
-- Path  
+- MongoDB
 - Git & GitHub  
 
 ## ▶️ Ejecución
