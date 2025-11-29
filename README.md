@@ -14,7 +14,7 @@ Este servidor expone una API RESTful para gestionar **usuarios** y **tarjetas**,
 - Actualizar perfil del usuario actual (`PATCH /users/me`)
 - Actualizar avatar del usuario actual (`PATCH /users/me/avatar`)
 
-- ### Tarjetas (Cards)
+### Tarjetas (Cards)
 - Crear tarjeta (`POST /cards`)
 - Obtener todas las tarjetas (`GET /cards`)
 - Eliminar tarjeta por ID (`DELETE /cards/:cardId`)
