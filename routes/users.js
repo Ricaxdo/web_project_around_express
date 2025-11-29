@@ -1,35 +1,23 @@
 const express = require('express');
-const { getUsers } = require('../utils/fileHandlers');
+const {
+  getUsers, getUserById, createUser, updateAvatar, updateProfile,
+} = require('../controllers/users');
 
 const router = express.Router();
 
-// GET /users → todos los usuarios
-router.get('/', async (req, res) => {
-  try {
-    const users = await getUsers();
-    res.json(users);
-  } catch {
-    res.status(500).json({ message: 'Error al leer el archivo de usuarios' });
-  }
-});
+// GET /users → devuelve todos los usuarios
+router.get('/', getUsers);
 
-// GET /users/:id → usuario por id
-router.get('/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const users = await getUsers();
+// GET /users/:userId → devuelve un usuario por ID
+router.get('/:userId', getUserById);
 
-    const user = users.find((item) => item._id === id);
+// POST /users → crea un usuario nuevo
+router.post('/', createUser);
 
-    if (!user) {
-      res.status(404).json({ message: 'ID de usuario no encontrado' });
-      return;
-    }
+// PATCH /users/me → actualiza el perfil del usuario
+router.patch('/me', updateProfile);
 
-    res.json(user);
-  } catch {
-    res.status(500).json({ message: 'Error al leer el archivo de usuarios' });
-  }
-});
+// PATCH /users/me/avatar → actualiza el avatar del usuario
+router.patch('/me/avatar', updateAvatar);
 
 module.exports = router;
